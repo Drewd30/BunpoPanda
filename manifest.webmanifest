@@ -1,0 +1,18 @@
+{
+  "name": "BunpoPanda — Japanese Grammar",
+  "short_name": "BunpoPanda",
+  "description": "JLPT N5–N3 grammar study with quizzes and offline support",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f8f3",
+  "theme_color": "#2da568",
+  "icons": [
+    {
+      "src": "assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
