@@ -3610,12 +3610,6 @@
         "japanese": "ジェーンはまさに家から出ようとしていた。",
         "reading": "ジェーンはまさにいえからでようとしていた。",
         "english": "Jane was about to leave the house."
-      },
-      {
-        "usage": "Be about to A; Try to A",
-        "japanese": "母はそろそろ寝ようとしている。",
-        "reading": "はははそろそろねようとしている。",
-        "english": "Mom is about to go to sleep."
       }
     ]
   },
@@ -3778,12 +3772,6 @@
         "japanese": "そんなに恥ずかしがらないで堂々とスピーチしてください。",
         "reading": "そんなにはずかしがらないでどうどうとスピーチしてください。",
         "english": "Don't be so shy and please give a great speech."
-      },
-      {
-        "usage": "Wants to A",
-        "japanese": "弟は馬に乗りたがっているので明日一緒に農家に行くつもり。",
-        "reading": "おとうとはうまにのりたがっているのであしたいっしょにのうかにいくつもり。",
-        "english": "My younger brother wants to ride a horse, so we are going to go to a farm tomorrow."
       }
     ]
   },
@@ -3908,12 +3896,6 @@
         "japanese": "その部屋はなんて寒かったことか。",
         "reading": "そのへやはなんてさむかったことか。",
         "english": "How cold it was in the room!"
-      },
-      {
-        "usage": "How A; so A; how much A!",
-        "japanese": "彼女のスピーチはなんてうまいことか。",
-        "reading": "かのじょのスピーチはなんてうまいことか。",
-        "english": "How very good her speech is!"
       }
     ]
   },
@@ -4376,12 +4358,6 @@
         "japanese": "僕だったら大丈夫だい。",
         "reading": "ぼくだったらだいじょうぶだい。",
         "english": "I'd be fine if it was me."
-      },
-      {
-        "usage": "Turns sentence A into a question (casual).",
-        "japanese": "君のお母さんはどんな人だい？",
-        "reading": "きみのおかあさんはどんなひとだい？",
-        "english": "What kind of person is your mother?"
       }
     ]
   },
@@ -6026,12 +6002,6 @@
         "japanese": "どうりでみち子は嫌がるわけだ。",
         "reading": "どうりでみちこはいやがるわけだ。",
         "english": "It's no surprise that Michiko doesn't like it."
-      },
-      {
-        "usage": "As you'd expect, A; Of course, A",
-        "japanese": "彼は十年も日本で暮らしてるんですね。どうりで日本語がうまいわけだ。",
-        "reading": "かれはじゅうねんもにほんでくらしてるんですね。どうりでにほんごがうまいわけだ。",
-        "english": "He's been living in Japan for 10 years. It's no wonder he's good at Japanese."
       }
     ]
   },

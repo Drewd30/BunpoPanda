@@ -2585,7 +2585,7 @@ $('bpGenerateQR')?.addEventListener('click',generate);$('bpQRClose')?.addEventLi
 $('bpBackupStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0));$('bpClearStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0));$('settingsOpen')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0));updateBackupLabel();
 })();
 </script><script id="bp-offline-library-updates">
-/* v34: the local library is authoritative. Downloading published grammar.json
+/* v35: the local library is authoritative. Downloading published grammar.json
    is opt-in only, and the installed snapshot remains available offline. */
 (()=>{
   const PATH='./data/grammar.json';
@@ -2600,12 +2600,14 @@ $('bpBackupStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0)
   function isOnlineHost(){return /^https?:$/.test(location.protocol)}
   function valid(rows){return Array.isArray(rows)&&rows.length>0&&rows.every(x=>x&&typeof x==='object'&&typeof x.expression==='string'&&x.expression.trim()&&typeof x.format==='string'&&Array.isArray(x.usages)&&x.usages.every(u=>u&&typeof u.japanese==='string'))}
   function normalize(rows){
-    const ids=new Set(),identities=new Set();
+    // Different grammar usages may deliberately share the same expression
+    // (for example, the two N3 entries named さ). Uniqueness is by ID,
+    // not by display text; the latter would block the official library.
+    const ids=new Set();
     return rows.map((entry,i)=>{
       const x={...entry,id:Number.isSafeInteger(Number(entry.id))&&Number(entry.id)>0?Number(entry.id):i+1,level:entry.level||'N5'};
-      const key=identity(x);
-      if(ids.has(x.id)||identities.has(key))throw Error('Published library contains duplicate grammar entries or IDs');
-      ids.add(x.id);identities.add(key);return x;
+      if(ids.has(x.id))throw Error('Published grammar.json contains duplicate ID '+x.id+'. Give each entry a unique ID.');
+      ids.add(x.id);return x;
     });
   }
   function identity(x){return String(x.level||'N5')+'\u001f'+String(x.expression).normalize('NFKC').trim()}
