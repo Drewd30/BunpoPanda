@@ -1,9 +1,13 @@
-BunpoPanda v20
+BunpoPanda v29
 
-Keep index.html and the assets/ folder together. To change the header, favicon, and phone shortcut icon, replace only assets/logo.png with a square PNG. If opening index.html directly, open it from the extracted folder, not from ZIP preview, and leave assets/logo.png alongside it. If missing, a fallback panda drawing appears.
+Open index.html directly from the extracted BunpoPanda folder.
+For installable PWA functionality, host the folder on HTTPS or localhost.
 
-The bookmark/PWA icon may require removing and re-adding the home screen shortcut after changing images because browsers cache icons. HTTPS/localhost is needed to install the PWA; file:// works for basic website functionality.
+Changes:
+- QR/Paste transfer now carries a 96x96 JPEG profile thumbnail at 0.78 quality.
+- Visible QR uses the best thumbnail resolution that can fit a single QR.
+- Saved BunpoPanda QR PNG embeds the higher-quality transfer in PNG metadata, supporting offline QR-image import with a sharper restored profile photo.
+- Successful progress restoration displays a themed confirmation popup.
+- QR generator and other scrollable panels now use thin rounded green scrollbars in light and dark themes.
 
-Settings -> Stats -> Back up & compact preserves aggregate quiz statistics but deletes individual round logs. Settings -> Clear results deletes both recent rounds and the summary. Export JSON before compacting if you want to keep a full copy of round history. Export JSON also includes compacted stats.
-
-Grammar library: data/grammar.json (editable) and data/grammar-data.js (local file:// fallback).
+Note: If you scan the visible QR using an external reader, photo quality depends on QR capacity. For better photo fidelity, transfer using the saved BunpoPanda QR PNG or Paste Transfer Text.
