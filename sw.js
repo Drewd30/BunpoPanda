@@ -1,5 +1,5 @@
-const CACHE='bunpopanda-v36-offline-verified';
-const PRECACHE=['./','./index.html','./data/grammar.json','./manifest.webmanifest','./assets/logo.png','./qr-encoder.js','./qr-transfer.js'];
+const CACHE='bunpopanda-v36-clean-repository';
+const PRECACHE=['./','./index.html','./data/grammar.json','./manifest.webmanifest','./assets/logo.png'];
 self.addEventListener('install', event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(PRECACHE)).then(()=>self.skipWaiting()));
 });
