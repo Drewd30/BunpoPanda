@@ -1092,7 +1092,19 @@ function eligible(r){return num(r.correct)+num(r.wrong)>0}
 function fmt(r){return eligible(r)?100*num(r.correct)/(num(r.correct)+num(r.wrong)):null}
 function localDay(date){const d=new Date(date);if(Number.isNaN(+d))return null;return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function summarize(records,base=empty()){
- const s=structuredClone(base);
+ // Old QR imports and early compact backups may omit levels/days, or
+ // contain only a subset of JLPT levels. Never assume nested stats exist.
+ const safe=base&&typeof base==='object'?base:{};
+ const s={...empty(),...structuredClone(safe)};
+ s.levels=Object.fromEntries(LEVELS.map(l=>{
+   const v=safe.levels?.[l]||{};
+   return [l,{sum:num(v.sum),count:num(v.count)}];
+ }));
+ s.days={};
+ for(const [day,v] of Object.entries(safe.days&&typeof safe.days==='object'?safe.days:{})){
+   s.days[day]={sum:num(v?.sum),count:num(v?.count)};
+ }
+ for(const k of ['rounds','correct','wrong','accuracySum','scoredRounds'])s[k]=num(s[k]);
  for(const r of records){if(!r||typeof r!=='object')continue;s.rounds++;
   const c=num(r.correct),w=num(r.wrong);s.correct+=c;s.wrong+=w;
   const a=fmt(r);if(a!==null){s.accuracySum+=a;s.scoredRounds++;
@@ -1108,7 +1120,7 @@ function renderLifetime(){
  const versionNode=document.getElementById('bpLibraryVersion');if(versionNode)versionNode.textContent=data.length?'grammar.json · '+data.length+' expressions · '+[...new Set(data.map(x=>x.level||'N5'))].join(', '):'No library installed · 0 expressions';
  const archived=getSummary(),raw=getRecords(),total=summarize(raw,archived);
  const today=localDay(new Date()),daily=total.days[today]||{sum:0,count:0};
- const rows=LEVELS.filter(l=>data.some(x=>x.level===l)).map(l=>`<div class="bp-quiz-stat-row"><span>${l}</span><b>${average(total.levels[l].sum,total.levels[l].count)}</b><small>${total.levels[l].count} round${total.levels[l].count===1?'':'s'}</small></div>`).join('');
+ const rows=LEVELS.filter(l=>data.some(x=>x.level===l)).map(l=>{const v=total.levels?.[l]||{sum:0,count:0};return `<div class="bp-quiz-stat-row"><span>${l}</span><b>${average(v.sum,v.count)}</b><small>${v.count} round${v.count===1?'':'s'}</small></div>`}).join('');
  $('bpLifetimeStats').innerHTML=`<div class="bp-quiz-stat-row"><span>Quizzes taken</span><b>${total.rounds}</b><small>${archived.rounds} archived · ${raw.length} recent</small></div><div class="bp-quiz-stat-row"><span>Lifetime correct</span><b>${pct(total.correct,total.correct+total.wrong)}</b><small>${total.correct} correct / ${total.correct+total.wrong} answered</small></div><div class="bp-quiz-stat-row"><span>Lifetime average</span><b>${average(total.accuracySum,total.scoredRounds)}</b><small>Average accuracy across ${total.scoredRounds} scored rounds</small></div><div class="bp-quiz-stat-row"><span>Daily average</span><b>${average(daily.sum,daily.count)}</b><small>${daily.count} scored quizzes today</small></div><div class="bp-quiz-stat-sub">Average per level</div>${rows}`;
 }
 if(!$('bpLifetimeStats'))return;
@@ -2585,7 +2597,7 @@ $('bpGenerateQR')?.addEventListener('click',generate);$('bpQRClose')?.addEventLi
 $('bpBackupStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0));$('bpClearStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0));$('settingsOpen')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0));updateBackupLabel();
 })();
 </script><script id="bp-offline-library-updates">
-/* v35: the local library is authoritative. Downloading published grammar.json
+/* v36: the local library is authoritative. Downloading published grammar.json
    is opt-in only, and the installed snapshot remains available offline. */
 (()=>{
   const PATH='./data/grammar.json';
@@ -2630,8 +2642,10 @@ $('bpBackupStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0)
         if(!response.ok)throw Error('HTTP '+response.status);
         const raw=await response.json();if(!valid(raw))throw Error('The published grammar.json is invalid');
         const incoming=normalize(raw);
-        if(signature(incoming)===signature(data)){
-          pending=null;show('Library is up to date',`${data.length} expressions · ${levels(data)}. Your offline copy is ready.`);
+        let installed=data;
+        try{const stored=JSON.parse(localStorage.getItem(LIBRARY_KEY)||'null');if(Array.isArray(stored))installed=stored}catch{}
+        if(signature(incoming)===signature(installed)){
+          pending=null;show('Library is up to date',`${installed.length} expressions · ${levels(installed)}. Verified: your saved offline library matches the published GitHub JSON.`);
         }else{
           pending=incoming;
           show('New Version of Library is up!',`Published: ${incoming.length} expressions (${levels(incoming)}). Current: ${data.length} expressions (${levels(data)}). Install only if you want to replace your offline library.`,true);
@@ -2650,10 +2664,27 @@ $('bpBackupStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0)
       let previouslySaved=[];try{previouslySaved=JSON.parse(localStorage.getItem(PRESERVED_MASTERY)||'[]')}catch{}
       const masteredKeys=new Set([...oldData.filter(x=>oldMastered.has(x.id)).map(identity),...(Array.isArray(previouslySaved)?previouslySaved:[])]);
       const newMastered=new Set(incoming.filter(x=>masteredKeys.has(identity(x))).map(x=>x.id));
-      // Persist first, so re-opening offline returns to the selected installed version.
+      // Save the selected library first. UI refresh errors must never be
+      // misreported as storage failures after the data was already installed.
       localStorage.setItem(LIBRARY_KEY,JSON.stringify(incoming));
       localStorage.setItem(MASTERY_KEY,JSON.stringify([...newMastered]));
-      data=incoming;mastered=newMastered;pending=null;localStorage.removeItem(PRESERVED_MASTERY);
+      const actuallySaved=JSON.parse(localStorage.getItem(LIBRARY_KEY)||'null');
+      if(!Array.isArray(actuallySaved)||signature(actuallySaved)!==signature(incoming)){
+        throw Error('Saved library did not match the downloaded file. Please retry.');
+      }
+      data=actuallySaved;mastered=newMastered;pending=null;localStorage.removeItem(PRESERVED_MASTERY);
+    }catch(err){alert('Library update could not be saved: '+err.message);return}
+
+    // Content comparison is done against what was *actually* persisted,
+    // not counts, filenames or a previous update flag.
+    const savedMatchesPublished=signature(data)===signature(incoming);
+    if(!savedMatchesPublished){
+      show('Library verification needed','The installed library differs from the downloaded version. Check for updates again.',true);
+      pending=incoming;return;
+    }
+    show('Library is up to date',`${data.length} expressions · ${levels(data)}. Verified against your downloaded GitHub library; saved for offline use.`);
+    // A render/statistics issue cannot undo a successfully saved library.
+    try{
       if(!data.some(x=>(x.level||'N5')===selectedLevel)){
         selectedLevel=levels(data).split(' · ')[0]||'N5';category='All';openLevels=new Set([selectedLevel]);
       }
@@ -2661,10 +2692,9 @@ $('bpBackupStats')?.addEventListener('click',()=>setTimeout(updateBackupLabel,0)
       collapsed.clear();render();window.BPRefreshMasteryStats?.();window.BPStatsAPI?.renderLifetime?.();
       const versionNode=el('bpLibraryVersion');if(versionNode)versionNode.textContent='grammar.json · '+data.length+' expressions · '+levels(data);
       const current=el('selectedFilter');if(current)current.textContent=selectedLevel+' · '+category;
-      show('Updated library saved offline',`${data.length} expressions are installed. You may continue using them without internet.`);
-      alert('Your grammar library has been updated and saved for offline use!');
-      document.dispatchEvent(new CustomEvent('bunpopanda:library-updated',{detail:{entries:data.length,source:'official'}}));
-    }catch(err){alert('Library update could not be saved: '+err.message)}
+    }catch(refreshErr){console.warn('BunpoPanda library saved, but a display refresh failed:',refreshErr)}
+    alert('Your grammar library has been updated, verified, and saved for offline use!');
+    document.dispatchEvent(new CustomEvent('bunpopanda:library-updated',{detail:{entries:data.length,source:'official'}}));
   }
   const deleteModal=el('bpDeleteLibraryModal'),deleteSuccess=el('bpDeleteLibrarySuccess');
   const closeDelete=()=>{deleteModal.hidden=true};
