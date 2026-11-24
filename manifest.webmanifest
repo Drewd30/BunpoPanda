@@ -1,7 +1,7 @@
 {
-  "name": "BunpoPanda — Japanese Grammar",
+  "name": "BunpoPanda \u2014 Japanese Grammar",
   "short_name": "BunpoPanda",
-  "description": "JLPT N5–N3 grammar study with quizzes and offline support",
+  "description": "JLPT N5\u2013N3 grammar study with quizzes and offline support",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,10 +9,10 @@
   "theme_color": "#2da568",
   "icons": [
     {
-      "src": "assets/logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

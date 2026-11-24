@@ -1,14 +1,9 @@
-BunpoPanda — Logo Update
+BunpoPanda v20
 
-Open index.html directly from the extracted folder to use the grammar site without a server.
+Keep index.html and the assets/ folder together. To change the header, favicon, and phone shortcut icon, replace only assets/logo.png with a square PNG. If opening index.html directly, open it from the extracted folder, not from ZIP preview, and leave assets/logo.png alongside it. If missing, a fallback panda drawing appears.
 
-REPLACE LOGO WITH ONE IMAGE FILE:
-Put one image in the assets/ folder named logo.png, logo.jpg, logo.jpeg, logo.webp or logo.svg.
-- New PNG/JPG/JPEG/WebP takes priority over included assets/logo.svg, so you do NOT need to edit HTML.
-- To use your own SVG, simply replace assets/logo.svg.
-- For replacement with a different image type, just put the new image in assets/; no code changes.
-- If opening index.html by itself without the assets folder, an embedded default panda SVG appears automatically.
+The bookmark/PWA icon may require removing and re-adding the home screen shortcut after changing images because browsers cache icons. HTTPS/localhost is needed to install the PWA; file:// works for basic website functionality.
 
-PWA install/offline: serve the full folder on HTTPS or localhost. Direct file:// works for normal studying but cannot activate service workers. The installed PWA icon uses the placeholder assets/logo.svg; to customize the installed icon as well, replace that SVG file (PWA icon behavior varies by platform).
+Settings -> Stats -> Back up & compact preserves aggregate quiz statistics but deletes individual round logs. Settings -> Clear results deletes both recent rounds and the summary. Export JSON before compacting if you want to keep a full copy of round history. Export JSON also includes compacted stats.
 
-Your existing grammar data, global search, quizzes and settings are preserved.
+Grammar library: data/grammar.json (editable) and data/grammar-data.js (local file:// fallback).
